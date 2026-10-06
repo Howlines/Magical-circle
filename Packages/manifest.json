@@ -1,11 +1,12 @@
 {
   "dependencies": {
-    "com.meta.xr.mrutilitykit": "85.0.0",
+    "com.meta.xr.mrutilitykit": "207.0.0",
     "com.meta.xr.sdk.interaction": "207.0.0",
     "com.meta.xr.sdk.interaction.ovr": "207.0.0",
     "com.unity.ai.inference": "2.6.1",
     "com.unity.feature.development": "1.0.2",
     "com.unity.mobile.android-logcat": "1.4.7",
+    "com.unity.shadergraph": "17.3.0",
     "com.unity.ugui": "2.0.0",
     "com.unity.xr.management": "4.6.1",
     "com.unity.xr.openxr": "1.16.1",

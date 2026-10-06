@@ -7,6 +7,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 
 // Lit les glyphes dans l'image de la caméra du casque, et lance les sorts.
+// Le script est allumé/éteint par le geste (deux paumes vers le haut).
 public class GlyphReader : MonoBehaviour
 {
     [Header("Références")]
@@ -32,8 +33,12 @@ public class GlyphReader : MonoBehaviour
     private readonly Queue<string> m_history = new Queue<string>();
     private readonly Queue<string> m_messages = new Queue<string>();   // derniers messages, pour le debug
     private string m_current = "rien";  // dernier résultat validé
+    private bool m_discard;             // NOUVEAU : vrai = ignorer le résultat de l'analyse en cours
 
-    private void Start()
+    // MODIFIÉ : Awake au lieu de Start.
+    // Awake s'exécute au chargement de la scène, même si le script est désactivé,
+    // donc les références sont prêtes avant le premier geste (pas de saccade).
+    private void Awake()
     {
         foreach (Texture2D tex in m_refImages)
         {
@@ -41,6 +46,21 @@ public class GlyphReader : MonoBehaviour
             if (!m_recognizer.AddReference(tex.name.ToLower(), gray, w, h, out string error))
                 Debug.LogWarning("Référence " + tex.name + " ignorée : " + error);
         }
+    }
+
+    // NOUVEAU : appelé à chaque fois que le geste allume le script.
+    private void OnEnable()
+    {
+        m_history.Clear();          // on oublie les anciens votes
+        m_current = "rien";         // on peut relancer le même sort qu'avant
+        m_timer = 0f;               // on analyse tout de suite
+        m_discard = m_task != null; // une vieille analyse tourne encore ? on ignorera son résultat
+    }
+
+    // NOUVEAU : appelé à chaque fois que le joueur relâche le geste.
+    private void OnDisable()
+    {
+        if (m_text != null) m_text.text = "En attente du geste";
     }
 
     private void Update()
@@ -56,8 +76,9 @@ public class GlyphReader : MonoBehaviour
         {
             if (!m_task.IsCompleted) return;
             if (m_task.IsFaulted) Debug.LogError(m_task.Exception);
-            else OnResult(m_task.Result);
+            else if (!m_discard) OnResult(m_task.Result);   // MODIFIÉ : on jette les vieux résultats
             m_task = null;
+            m_discard = false;                              // NOUVEAU
         }
 
         m_timer -= Time.deltaTime;
