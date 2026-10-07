@@ -85,6 +85,49 @@ public class LivreVR : MonoBehaviour
 
     public bool EstOuvert => m_Ouvert;
 
+    // --- Pour les scripts qui affichent du contenu sur les pages (ex : SymbolesLivre) ----------
+    // Le livre a 4 "surfaces" (voir l'astuce en haut). On retient quelle page chacune affiche.
+    public enum Surface { Gauche, Recto, Verso, SousFeuille }
+    readonly int[] m_PageSur = new int[4];
+
+    public bool EstOccupe => m_Occupe;
+    public int PageSur(Surface s) => m_PageSur[(int)s];
+
+    public TMP_Text TexteDe(Surface s)
+    {
+        switch (s)
+        {
+            case Surface.Gauche: return texteGauche;
+            case Surface.Recto: return texteRecto;
+            case Surface.Verso: return texteVerso;
+            default: return texteSousFeuille;
+        }
+    }
+
+    // Écrit une page sur une surface ET retient son numéro.
+    void Ecrire(Surface s, int index)
+    {
+        m_PageSur[(int)s] = index;
+        TexteDe(s).text = Page(index);
+    }
+
+    /// <summary>
+    /// Change le contenu d'une page pendant le jeu (ex : nouvelle image quand une énigme est résolue).
+    /// Si la page est affichée en ce moment, elle est mise à jour tout de suite.
+    /// </summary>
+    public void RemplacerPage(int index, string contenu)
+    {
+        if (index < 0 || index >= pages.Length)
+            return;
+
+        pages[index] = contenu;
+        for (var s = 0; s < 4; s++)
+        {
+            if (m_PageSur[s] == index)
+                TexteDe((Surface)s).text = contenu;
+        }
+    }
+
     void Awake()
     {
         m_RepOuverture = osOuverture.localRotation;
@@ -202,8 +245,8 @@ public class LivreVR : MonoBehaviour
         JouerSon();
 
         var i = m_IndexPageGauche;
-        texteVerso.text = Page(i + 2);
-        texteSousFeuille.text = Page(i + 3);
+        Ecrire(Surface.Verso, i + 2);
+        Ecrire(Surface.SousFeuille, i + 3);
         texteVerso.enabled = true;
         texteSousFeuille.enabled = true;
 
@@ -222,10 +265,10 @@ public class LivreVR : MonoBehaviour
 
         // La feuille saute à gauche en montrant la page actuelle, puis revient à droite.
         var i = m_IndexPageGauche;
-        texteVerso.text = Page(i);
-        texteGauche.text = Page(i - 2);
-        texteRecto.text = Page(i - 1);
-        texteSousFeuille.text = Page(i + 1);
+        Ecrire(Surface.Verso, i);
+        Ecrire(Surface.Gauche, i - 2);
+        Ecrire(Surface.Recto, i - 1);
+        Ecrire(Surface.SousFeuille, i + 1);
         texteVerso.enabled = true;
         texteSousFeuille.enabled = true;
         PoserFeuille(180f, 0f);
@@ -271,8 +314,8 @@ public class LivreVR : MonoBehaviour
                 return false; // dernière double page
 
             // Même préparation que TournerVersLaDroite.
-            texteVerso.text = Page(i + 2);
-            texteSousFeuille.text = Page(i + 3);
+            Ecrire(Surface.Verso, i + 2);
+            Ecrire(Surface.SousFeuille, i + 3);
             m_AngleManuel = 0f;
         }
         else
@@ -282,10 +325,10 @@ public class LivreVR : MonoBehaviour
                 return DemarrerCouverture();
 
             // Même préparation que TournerVersLaGauche : la feuille saute à gauche.
-            texteVerso.text = Page(i);
-            texteGauche.text = Page(i - 2);
-            texteRecto.text = Page(i - 1);
-            texteSousFeuille.text = Page(i + 1);
+            Ecrire(Surface.Verso, i);
+            Ecrire(Surface.Gauche, i - 2);
+            Ecrire(Surface.Recto, i - 1);
+            Ecrire(Surface.SousFeuille, i + 1);
             m_AngleManuel = 180f;
         }
 
@@ -450,8 +493,8 @@ public class LivreVR : MonoBehaviour
 
     void AfficherDoublePage()
     {
-        texteGauche.text = Page(m_IndexPageGauche);
-        texteRecto.text = Page(m_IndexPageGauche + 1);
+        Ecrire(Surface.Gauche, m_IndexPageGauche);
+        Ecrire(Surface.Recto, m_IndexPageGauche + 1);
         texteVerso.enabled = false;
         texteSousFeuille.enabled = false;
     }
