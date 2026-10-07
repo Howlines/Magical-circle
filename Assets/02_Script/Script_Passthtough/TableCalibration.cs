@@ -4,18 +4,19 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-// Au lancement, le joueur délimite sa table en pinçant 3 points.
+// Au lancement, le joueur délimite sa table en pinçant 3 de ses coins, dans n'importe quel ordre.
 // On aligne ensuite l'environnement virtuel dessus et on ouvre la fenêtre passthrough.
 public class TableCalibration : MonoBehaviour
 {
-    [Header("Mains")]
+    [Header("Mains et tête")]
     [SerializeField] private Hand[] m_hands;            // main gauche et main droite
+    [SerializeField] private Transform m_head;          // CenterEyeAnchor : sert à savoir quel bord est face au joueur
 
     [Header("Scène")]
     [SerializeField] private Transform m_environment;   // racine de l'environnement virtuel
     [SerializeField] private Transform m_tableAnchor;   // dessus de la table virtuelle (enfant de l'environnement)
     [SerializeField] private Transform m_window;        // le quad passthrough (enfant de TableAnchor)
-    [SerializeField] private GameObject m_markerPrefab; // petite sphère posée sur chaque point
+    [SerializeField] private GameObject m_markerPrefab; // petite sphère posée sur chaque coin
     [SerializeField] private Text m_instructions;       // texte affiché au joueur
 
     [Header("Réglages")]
@@ -31,9 +32,9 @@ public class TableCalibration : MonoBehaviour
 
     private static readonly string[] Steps =
     {
-        "Pince le coin avant gauche de ta table",
-        "Pince le coin avant droit",
-        "Pince un point du bord du fond",
+        "Pince un coin de ta table",
+        "Pince un autre coin",
+        "Pince un troisième coin",
         "Pince encore pour valider"
     };
 
@@ -84,24 +85,48 @@ public class TableCalibration : MonoBehaviour
 
     private void Validate()
     {
-        Vector3 a = m_points[0], b = m_points[1], c = m_points[2];
-        float height = (a.y + b.y + c.y) / 3f;   // hauteur de la table = moyenne des 3 points
+        float height = (m_points[0].y + m_points[1].y + m_points[2].y) / 3f;   // hauteur = moyenne des 3 coins
 
-        // On calcule à plat (sans la hauteur) pour avoir un rectangle bien horizontal
-        Vector3 a2 = Flat(a), b2 = Flat(b), c2 = Flat(c);
-        Vector3 right = (b2 - a2).normalized;                 // direction du bord avant
-        Vector3 forward = Vector3.Cross(right, Vector3.up);   // perpendiculaire : vers le fond de la table
-        if (Vector3.Dot(c2 - a2, forward) < 0f) forward = -forward;   // si les coins ont été pincés dans l'autre ordre
+        // On calcule à plat (sans la hauteur)
+        Vector3 p0 = Flat(m_points[0]), p1 = Flat(m_points[1]), p2 = Flat(m_points[2]);
 
-        float width = Vector3.Distance(a2, b2);
-        float depth = Vector3.Dot(c2 - a2, forward);          // distance entre le bord avant et le point du fond
-        Vector3 center = (a2 + b2) / 2f + forward * depth / 2f;
+        // --- 1. Trouver la diagonale ---
+        // Sur 3 coins d'un rectangle, les deux points les plus éloignés sont forcément sur la diagonale.
+        // Le 3e point est le coin "entre les deux" (celui qui touche les deux bords).
+        Vector3 corner, q, r;
+        float d01 = Vector3.Distance(p0, p1), d02 = Vector3.Distance(p0, p2), d12 = Vector3.Distance(p1, p2);
+        if (d12 >= d01 && d12 >= d02)      { corner = p0; q = p1; r = p2; }
+        else if (d02 >= d01 && d02 >= d12) { corner = p1; q = p0; r = p2; }
+        else                               { corner = p2; q = p0; r = p1; }
+
+        // --- 2. Les deux axes de la table ---
+        Vector3 axis1 = (q - corner).normalized;             // le long d'un bord
+        Vector3 axis2 = Vector3.Cross(Vector3.up, axis1);     // l'autre bord, bien perpendiculaire
+        Vector3 diagonal = r - q;
+        float size1 = Mathf.Abs(Vector3.Dot(diagonal, axis1));   // longueur du bord le long de axis1
+        float size2 = Mathf.Abs(Vector3.Dot(diagonal, axis2));   // longueur du bord le long de axis2
+        Vector3 center = (q + r) / 2f;                        // le centre = milieu de la diagonale
         center.y = height;
 
-        // 1. On tourne l'environnement pour que TableAnchor soit orienté comme la vraie table
+        // --- 3. Quel bord est face au joueur ? ---
+        // "forward" doit pointer du joueur vers le fond de la table.
+        Vector3 toTable = Flat(center - m_head.position);
+        Vector3 forward;
+        float width, depth;
+        if (Mathf.Abs(Vector3.Dot(toTable, axis1)) > Mathf.Abs(Vector3.Dot(toTable, axis2)))
+        {
+            forward = axis1; depth = size1; width = size2;
+        }
+        else
+        {
+            forward = axis2; depth = size2; width = size1;
+        }
+        if (Vector3.Dot(toTable, forward) < 0f) forward = -forward;   // on le retourne s'il pointe vers le joueur
+
+        // --- 4. Aligner l'environnement ---
+        // On tourne d'abord (ce qui déplace aussi TableAnchor), puis on déplace.
         Quaternion targetRot = Quaternion.LookRotation(forward, Vector3.up);
         m_environment.rotation = targetRot * Quaternion.Inverse(m_tableAnchor.rotation) * m_environment.rotation;
-        // 2. Puis on le déplace pour que TableAnchor tombe pile au centre de la vraie table
         m_environment.position += center - m_tableAnchor.position;
 
         // La fenêtre prend la taille de la table (le quad est couché : x = largeur, y = profondeur)
