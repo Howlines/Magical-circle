@@ -1,0 +1,10 @@
+Page 25 (finale_scellee.png, 1024 x 1434 px). Origine en haut à gauche, positions en pixels.
+
+Emplacement feu      : centre x=512  y=384  diamètre du cercle = 77 px  (glyphe conseillé : environ 61 px, fichier glyphe_feu.png)
+Emplacement eau      : centre x=853  y=632  diamètre du cercle = 77 px  (glyphe conseillé : environ 61 px, fichier glyphe_eau.png)
+Emplacement vent     : centre x=723  y=1032  diamètre du cercle = 77 px  (glyphe conseillé : environ 61 px, fichier glyphe_vent.png)
+Emplacement terre    : centre x=301  y=1032  diamètre du cercle = 77 px  (glyphe conseillé : environ 61 px, fichier glyphe_terre.png)
+Emplacement lumiere  : centre x=171  y=632  diamètre du cercle = 77 px  (glyphe conseillé : environ 61 px, fichier glyphe_lumiere.png)
+Grand cercle central : centre x=512  y=742  diamètre = 512 px  (glyphe final : environ 333 px, fichier glyphe_final_or.png)
+
+Le glyphe final est encore provisoire.
