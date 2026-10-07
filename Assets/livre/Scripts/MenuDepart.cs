@@ -1,0 +1,177 @@
+using System.Collections;
+using TMPro;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
+
+/// <summary>
+/// Menu de départ (Start / Options / Quitter), utilisable avec les mains sur Quest 3 :
+/// toucher du doigt (poke) ou rayon + pincement, grâce aux interactions Meta ajoutées sur le canvas.
+/// Start cache le menu et affiche un message mystérieux qui invite à trouver le livre.
+/// </summary>
+public class MenuDepart : MonoBehaviour
+{
+    [Header("Panneaux")]
+    public GameObject panneauPrincipal;
+    public GameObject panneauOptions;
+
+    [Header("Options")]
+    public Slider sliderVolume;
+    public TMP_Text texteVolume;
+
+    [Header("Message après Start")]
+    public MessageMystere message;
+    public float dureeFonduMessage = 2f;
+    public float dureeAffichageMessage = 9f;
+
+    [Header("Placement devant le joueur")]
+    [Tooltip("Tête du joueur (CenterEyeAnchor). Vide = caméra principale.")]
+    public Transform tete;
+    [Tooltip("Distance du menu : à portée de main pour pouvoir le toucher du doigt.")]
+    public float distance = 0.55f;
+    [Tooltip("Le menu est un peu plus bas que les yeux, plus confortable pour les bras.")]
+    public float sousLesYeux = 0.2f;
+    public float distanceMessage = 1.2f;
+
+    [Header("Test au clavier (sans casque)")]
+    [Tooltip("Entrée : Start. Tab : Options. Retour arrière : Retour. Échap : Quitter.")]
+    public bool raccourcisClavier = true;
+
+    const string k_CleVolume = "MagicalCircle.Volume";
+
+    void Awake()
+    {
+        AudioListener.volume = PlayerPrefs.GetFloat(k_CleVolume, 1f);
+        if (sliderVolume != null)
+        {
+            sliderVolume.SetValueWithoutNotify(AudioListener.volume);
+            sliderVolume.onValueChanged.AddListener(ChangerVolume);
+        }
+        AfficherVolume();
+
+        if (message != null)
+            message.gameObject.SetActive(false);
+        AfficherPanneau(principal: true);
+    }
+
+    IEnumerator Start()
+    {
+        var groupe = GetComponent<CanvasGroup>();
+        if (groupe != null)
+            groupe.alpha = 0f;
+
+        // On attend que le casque ait donné la position de la tête avant de placer le menu.
+        yield return null;
+        yield return null;
+        PlacerDevant(transform, distance, sousLesYeux);
+        yield return Apparition(0f, 1f, dureeApparition);
+    }
+
+    [Header("Animation")]
+    public float dureeApparition = 1.2f;
+    bool m_EnTrainDePartir;
+
+    IEnumerator Apparition(float de, float vers, float duree)
+    {
+        var groupe = GetComponent<CanvasGroup>();
+        var echelle = transform.localScale;
+        for (var t = 0f; t < duree; t += Time.unscaledDeltaTime)
+        {
+            var k = Mathf.SmoothStep(0f, 1f, t / duree);
+            var a = Mathf.Lerp(de, vers, k);
+            if (groupe != null)
+                groupe.alpha = a;
+            transform.localScale = echelle * Mathf.Lerp(0.92f, 1f, a);
+            yield return null;
+        }
+        if (groupe != null)
+            groupe.alpha = vers;
+        transform.localScale = echelle;
+    }
+
+    IEnumerator Partir()
+    {
+        m_EnTrainDePartir = true;
+        if (message != null)
+            message.Afficher(this);
+        yield return Apparition(1f, 0f, dureeApparition * 0.6f);
+        gameObject.SetActive(false);
+    }
+
+    void Update()
+    {
+        var clavier = Keyboard.current;
+        if (!raccourcisClavier || clavier == null)
+            return;
+
+        if (clavier.enterKey.wasPressedThisFrame || clavier.numpadEnterKey.wasPressedThisFrame)
+            Commencer();
+        else if (clavier.tabKey.wasPressedThisFrame)
+            OuvrirOptions();
+        else if (clavier.backspaceKey.wasPressedThisFrame)
+            RetourMenu();
+        else if (clavier.escapeKey.wasPressedThisFrame)
+            Quitter();
+    }
+
+    // --- Boutons -----------------------------------------------------------------------------
+
+    public void Commencer()
+    {
+        if (!m_EnTrainDePartir)
+            StartCoroutine(Partir());
+    }
+
+    public void OuvrirOptions() => AfficherPanneau(principal: false);
+
+    public void RetourMenu() => AfficherPanneau(principal: true);
+
+    public void Quitter()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
+
+    // --- Outils ------------------------------------------------------------------------------
+
+    void ChangerVolume(float valeur)
+    {
+        AudioListener.volume = valeur;
+        PlayerPrefs.SetFloat(k_CleVolume, valeur);
+        AfficherVolume();
+    }
+
+    void AfficherVolume()
+    {
+        if (texteVolume != null)
+            texteVolume.text = $"Volume : {Mathf.RoundToInt(AudioListener.volume * 100f)} %";
+    }
+
+    void AfficherPanneau(bool principal)
+    {
+        if (panneauPrincipal != null)
+            panneauPrincipal.SetActive(principal);
+        if (panneauOptions != null)
+            panneauOptions.SetActive(!principal);
+    }
+
+    /// <summary>Place un objet face au joueur, à l'horizontale de son regard.</summary>
+    public void PlacerDevant(Transform objet, float dist, float plusBas)
+    {
+        var t = tete != null ? tete : Camera.main != null ? Camera.main.transform : null;
+        if (t == null)
+            return;
+
+        var avant = Vector3.ProjectOnPlane(t.forward, Vector3.up);
+        if (avant.sqrMagnitude < 0.001f)
+            avant = Vector3.ProjectOnPlane(t.up, Vector3.up);
+        avant.Normalize();
+
+        objet.position = t.position + avant * dist + Vector3.down * plusBas;
+        // Un canvas se lit depuis son côté -Z : son "avant" doit regarder à l'opposé du joueur.
+        objet.rotation = Quaternion.LookRotation(avant, Vector3.up);
+    }
+}
