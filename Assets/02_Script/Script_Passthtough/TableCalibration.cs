@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Oculus.Interaction.Input;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UI;
 
 // Au lancement, le joueur délimite sa table en pinçant 3 de ses coins, dans n'importe quel ordre.
 // On aligne ensuite l'environnement virtuel dessus, on l'accroche à une ancre spatiale
@@ -19,7 +19,10 @@ public class TableCalibration : MonoBehaviour
     [SerializeField] private Transform m_tableAnchor;   // dessus de la table virtuelle (enfant de l'environnement)
     [SerializeField] private Transform m_window;        // le quad passthrough (enfant de TableAnchor)
     [SerializeField] private GameObject m_markerPrefab; // petite sphère posée sur chaque coin
-    [SerializeField] private Text m_instructions;       // texte affiché au joueur
+
+    [Header("Instructions")]
+    [SerializeField] private TMP_Text m_instructions;       // texte des étapes (TextMeshPro)
+    [SerializeField] private GameObject m_instructionsPanel; // panneau entier (parchemin, halo...) affiché pendant le calibrage
 
     [Header("Réglages")]
     [SerializeField] private float m_margin = 0.05f;    // marge autour de la table, en mètres
@@ -35,7 +38,7 @@ public class TableCalibration : MonoBehaviour
 
     private static readonly string[] Steps =
     {
-        "Pince un coin de ta table",
+        "Délimite ta zone de travail. <b> Pince un coin de ta table <b>",
         "Pince un autre coin",
         "Pince un troisième coin",
         "Pince encore pour valider"
@@ -61,8 +64,8 @@ public class TableCalibration : MonoBehaviour
         m_points.Clear();
         m_done = false;
         m_environment.gameObject.SetActive(false);   // on cache le virtuel : le joueur voit sa vraie table
-        m_instructions.gameObject.SetActive(true);
-        m_instructions.text = Steps[0];
+        AfficherInstructions(true);
+        if (m_instructions != null) m_instructions.text = Steps[0];
     }
 
     private void Update()
@@ -93,7 +96,7 @@ public class TableCalibration : MonoBehaviour
 
         m_points.Add(point);
         if (m_markerPrefab != null) m_markers.Add(Instantiate(m_markerPrefab, point, Quaternion.identity));
-        m_instructions.text = Steps[m_points.Count];
+        if (m_instructions != null) m_instructions.text = Steps[m_points.Count];
     }
 
     private void Validate()
@@ -144,10 +147,19 @@ public class TableCalibration : MonoBehaviour
 
         foreach (GameObject m in m_markers) Destroy(m);
         m_markers.Clear();
-        m_instructions.gameObject.SetActive(false);
+        AfficherInstructions(false);
         m_environment.gameObject.SetActive(true);
         m_done = true;
         m_onCalibrated.Invoke();
+    }
+
+    // Affiche / cache le panneau entier s'il est renseigné, sinon juste le texte.
+    private void AfficherInstructions(bool visible)
+    {
+        if (m_instructionsPanel != null)
+            m_instructionsPanel.SetActive(visible);
+        else if (m_instructions != null)
+            m_instructions.gameObject.SetActive(visible);
     }
 
     private static Vector3 Flat(Vector3 v) => new Vector3(v.x, 0f, v.z);

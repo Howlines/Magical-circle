@@ -7,7 +7,8 @@ using UnityEngine.UI;
 /// <summary>
 /// Menu de départ (Start / Options / Quitter), utilisable avec les mains sur Quest 3 :
 /// toucher du doigt (poke) ou rayon + pincement, grâce aux interactions Meta ajoutées sur le canvas.
-/// Start cache le menu et affiche un message mystérieux qui invite à trouver le livre.
+/// Play cache le menu et affiche un message mystérieux. Quand le joueur ferme le message,
+/// les objets de la liste "Activer Apres Start" sont activés (ex : la calibration de la table).
 /// </summary>
 public class MenuDepart : MonoBehaviour
 {
@@ -22,7 +23,10 @@ public class MenuDepart : MonoBehaviour
     [Header("Message après Start")]
     public MessageMystere message;
     public float dureeFonduMessage = 2f;
-    public float dureeAffichageMessage = 9f;
+
+    [Header("Lancé après le message")]
+    [Tooltip("Objets désactivés au départ, activés quand le joueur ferme le message (ex : TableCalibration).")]
+    public GameObject[] activerApresStart;
 
     [Header("Placement devant le joueur")]
     [Tooltip("Tête du joueur (CenterEyeAnchor). Vide = caméra principale.")]
@@ -37,7 +41,11 @@ public class MenuDepart : MonoBehaviour
     [Tooltip("Entrée : Start. Tab : Options. Retour arrière : Retour. Échap : Quitter.")]
     public bool raccourcisClavier = true;
 
+    [Header("Animation")]
+    public float dureeApparition = 1.2f;
+
     const string k_CleVolume = "MagicalCircle.Volume";
+    bool m_EnTrainDePartir;
 
     void Awake()
     {
@@ -67,10 +75,6 @@ public class MenuDepart : MonoBehaviour
         yield return Apparition(0f, 1f, dureeApparition);
     }
 
-    [Header("Animation")]
-    public float dureeApparition = 1.2f;
-    bool m_EnTrainDePartir;
-
     IEnumerator Apparition(float de, float vers, float duree)
     {
         var groupe = GetComponent<CanvasGroup>();
@@ -92,10 +96,26 @@ public class MenuDepart : MonoBehaviour
     IEnumerator Partir()
     {
         m_EnTrainDePartir = true;
+
+        // Le message lancera la suite quand le joueur l'aura fermé.
+        // Sans message, on lance la suite tout de suite.
         if (message != null)
-            message.Afficher(this);
+            message.Afficher(this, LancerLaSuite);
+        else
+            LancerLaSuite();
+
         yield return Apparition(1f, 0f, dureeApparition * 0.6f);
         gameObject.SetActive(false);
+    }
+
+    /// <summary>Active les objets de la liste (calibration, etc.).</summary>
+    public void LancerLaSuite()
+    {
+        if (activerApresStart == null)
+            return;
+        foreach (var objet in activerApresStart)
+            if (objet != null)
+                objet.SetActive(true);
     }
 
     void Update()
