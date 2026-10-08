@@ -14,12 +14,21 @@ public class SpellCaster : MonoBehaviour
     [SerializeField] private Transform m_head;                  // CenterEyeAnchor
     [SerializeField] private Transform m_trackingSpace;         // TrackingSpace de l'OVRCameraRig (hauteur du sol)
 
+    [Header("Verrou (uniquement pour le sort de fin)")]
+    [SerializeField] private SymbolesLivre m_book;              // vide = pas de verrou, le sort marche toujours
+
     // Appelée par l'événement m_onSpell de GlyphReader.
     // Doit être public et avoir exactement ces paramètres (string, Vector3) pour apparaître dans l'Inspector.
     public void CastSpell(string glyph, Vector3 position)
     {
+        // --- 1. --- Le bon glyphe ?
         if (glyph != m_glyphName) return;   // pas le bon glyphe : on ignore
 
+        // --- 2. --- Le sort est-il débloqué ?
+        // Si un livre est relié, le sort ne marche qu'une fois toutes les pages validées.
+        if (m_book != null && !m_book.EstResolu) return;
+
+        // --- 3. --- Où faire apparaître l'effet
         Vector3 spawnPos = position + m_offset;   // par défaut : sur la feuille
 
         if (m_castOnFloor)
@@ -30,6 +39,7 @@ public class SpellCaster : MonoBehaviour
             spawnPos.y = m_trackingSpace.position.y;
         }
 
+        // --- 4. --- Lancer l'effet
         GameObject fx = Instantiate(m_effectPrefab, spawnPos, Quaternion.identity);
         Destroy(fx, m_lifetime);            // nettoyage automatique
     }

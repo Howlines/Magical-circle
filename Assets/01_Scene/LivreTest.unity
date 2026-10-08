@@ -139,7 +139,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &11499066
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19288,6 +19288,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Livre VR
       objectReference: {fileID: 0}
+    - target: {fileID: 8673168926405171263, guid: e5bd9258802c96c458898a09c4f7dfb7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 9049771544369586958, guid: e5bd9258802c96c458898a09c4f7dfb7, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -19961,7 +19965,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!108 &942283612
 Light:
   m_ObjectHideFlags: 0
