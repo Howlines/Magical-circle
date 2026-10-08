@@ -34,6 +34,10 @@ public class LivreVR : MonoBehaviour
     [Tooltip("O : ouvrir / fermer. Flèche droite : page suivante. Flèche gauche : page précédente.")]
     public bool raccourcisClavier = true;
 
+    [Header("Debug build")]
+    [Tooltip("Pour tester en build : le livre s'ouvre et tourne ses pages tout seul en boucle, avec l'animation automatique.")]
+    public bool testTourAutoEnBoucle;
+
     [Header("Son (optionnel)")]
     public AudioSource sonPage;
 
@@ -153,6 +157,28 @@ public class LivreVR : MonoBehaviour
         PoserFeuille(0f, 0f);
         AfficherDoublePage();
         MettreAJourEtat();
+
+        if (testTourAutoEnBoucle)
+            StartCoroutine(TestEnBoucle());
+    }
+
+    // Debug build : ouvre puis tourne les pages tout seul toutes les 2 secondes.
+    IEnumerator TestEnBoucle()
+    {
+        Debug.Log($"[LivreVR] Test auto. Courbure = {courbure}");
+        while (true)
+        {
+            yield return new WaitForSeconds(2f);
+            if (!m_Ouvert)
+                OuvrirOuFermer();
+            else if (m_IndexPageGauche + 2 < pages.Length)
+                PageSuivante();
+            else if (!m_Occupe)
+            {
+                m_IndexPageGauche = 0; // on recommence au début
+                AfficherDoublePage();
+            }
+        }
     }
 
     void Update()
