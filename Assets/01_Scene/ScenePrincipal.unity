@@ -705,14 +705,19 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 395694046}
+  - component: {fileID: 395694051}
   - component: {fileID: 395694045}
+  - component: {fileID: 395694050}
+  - component: {fileID: 395694049}
+  - component: {fileID: 395694048}
+  - component: {fileID: 395694047}
   m_Layer: 0
   m_Name: SpellCaster
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &395694045
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -729,6 +734,9 @@ MonoBehaviour:
   m_effectPrefab: {fileID: 5551718882146614446, guid: d9170c1377bf1894396758d6e712e615, type: 3}
   m_lifetime: 5
   m_offset: {x: 0, y: 0.02, z: 0}
+  m_castOnFloor: 0
+  m_head: {fileID: 0}
+  m_trackingSpace: {fileID: 0}
 --- !u!4 &395694046
 Transform:
   m_ObjectHideFlags: 0
@@ -744,6 +752,101 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &395694047
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 395694044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96d59850ecdc01246bfc61d80bf724e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpellCaster
+  m_glyphName: ultimate
+  m_effectPrefab: {fileID: 3377181292992421420, guid: 48c5715f9603c3842a353516a8baefbb, type: 3}
+  m_lifetime: 5
+  m_offset: {x: 0, y: 0, z: 0}
+  m_castOnFloor: 1
+  m_head: {fileID: 1848740388}
+  m_trackingSpace: {fileID: 131451331}
+--- !u!114 &395694048
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 395694044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96d59850ecdc01246bfc61d80bf724e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpellCaster
+  m_glyphName: light
+  m_effectPrefab: {fileID: 100000, guid: 876cb26c7c6ab42e49a9cace28b90b8b, type: 3}
+  m_lifetime: 5
+  m_offset: {x: 0, y: 0.02, z: 0}
+  m_castOnFloor: 0
+  m_head: {fileID: 0}
+  m_trackingSpace: {fileID: 0}
+--- !u!114 &395694049
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 395694044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96d59850ecdc01246bfc61d80bf724e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpellCaster
+  m_glyphName: earth
+  m_effectPrefab: {fileID: 7453856203882725520, guid: ad87df8c6b32ecf44bd5b0d2dff961db, type: 3}
+  m_lifetime: 5
+  m_offset: {x: 0, y: 0.02, z: 0}
+  m_castOnFloor: 0
+  m_head: {fileID: 0}
+  m_trackingSpace: {fileID: 0}
+--- !u!114 &395694050
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 395694044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96d59850ecdc01246bfc61d80bf724e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpellCaster
+  m_glyphName: wind
+  m_effectPrefab: {fileID: 2359262369486270923, guid: d3b32f7230291664cb1b343156d56b60, type: 3}
+  m_lifetime: 5
+  m_offset: {x: 0, y: 0.02, z: 0}
+  m_castOnFloor: 0
+  m_head: {fileID: 0}
+  m_trackingSpace: {fileID: 0}
+--- !u!114 &395694051
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 395694044}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96d59850ecdc01246bfc61d80bf724e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpellCaster
+  m_glyphName: fire
+  m_effectPrefab: {fileID: 2972392977303283589, guid: 11c9a5d587e034e43a68d4ebfb901206, type: 3}
+  m_lifetime: 5
+  m_offset: {x: 0, y: 0.02, z: 0}
+  m_castOnFloor: 0
+  m_head: {fileID: 0}
+  m_trackingSpace: {fileID: 0}
 --- !u!1 &400173378
 GameObject:
   m_ObjectHideFlags: 0
@@ -843,7 +946,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &519379460
 Transform:
   m_ObjectHideFlags: 0
@@ -1244,7 +1347,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &717028858
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1791,7 +1894,67 @@ MonoBehaviour:
   m_onSpell:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 395694051}
+        m_TargetAssemblyTypeName: SpellCaster, Assembly-CSharp
+        m_MethodName: CastSpell
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 395694045}
+        m_TargetAssemblyTypeName: SpellCaster, Assembly-CSharp
+        m_MethodName: CastSpell
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 395694050}
+        m_TargetAssemblyTypeName: SpellCaster, Assembly-CSharp
+        m_MethodName: CastSpell
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 395694049}
+        m_TargetAssemblyTypeName: SpellCaster, Assembly-CSharp
+        m_MethodName: CastSpell
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 395694048}
+        m_TargetAssemblyTypeName: SpellCaster, Assembly-CSharp
+        m_MethodName: CastSpell
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 395694047}
         m_TargetAssemblyTypeName: SpellCaster, Assembly-CSharp
         m_MethodName: CastSpell
         m_Mode: 0
@@ -8628,7 +8791,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1397058627
 Transform:
   m_ObjectHideFlags: 0
@@ -9364,7 +9527,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7847449403238870662, guid: abfaad578d05e4a09838223134c41c46, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9703,7 +9866,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2047083817
 Transform:
   m_ObjectHideFlags: 0
@@ -9845,7 +10008,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &2080730926
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9947,11 +10110,11 @@ SceneRoots:
   m_Roots:
   - {fileID: 1441500616}
   - {fileID: 1608124431}
+  - {fileID: 2080730928}
   - {fileID: 717028859}
   - {fileID: 1230551218}
   - {fileID: 1397058627}
   - {fileID: 395694046}
-  - {fileID: 2080730928}
   - {fileID: 1551866853}
   - {fileID: 519379460}
   - {fileID: 2047083817}
