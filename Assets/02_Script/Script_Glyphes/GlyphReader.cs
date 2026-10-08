@@ -25,6 +25,7 @@ public class GlyphReader : MonoBehaviour
     [SerializeField] private int m_maxSize = 800;       // taille max de l'image analysée
     [SerializeField] private int m_historySize = 5;     // nombre de dernières analyses mémorisées
     [SerializeField] private int m_votesNeeded = 3;     // combien doivent être d'accord pour valider
+    [SerializeField] private int m_failsNeeded = 6;     // NOUVEAU : nombre d'"inconnu" D'AFFILÉE avant de rater (environ 0,4 s chacun)
 
     [Header("Événements")]
     [SerializeField] private UnityEvent<string, Vector3> m_onSpell;   // glyphe reconnu + position du cercle
@@ -36,6 +37,7 @@ public class GlyphReader : MonoBehaviour
     private readonly Queue<string> m_messages = new Queue<string>();   // derniers messages, pour le debug
     private string m_current = "rien";  // dernier résultat validé
     private bool m_discard;             // vrai = ignorer le résultat de l'analyse en cours
+    private int m_failCount;            // NOUVEAU : nombre d'"inconnu" d'affilée
 
     // Awake s'exécute au chargement de la scène, même si le composant est décoché
     // (tant que l'objet GlyphReader est actif).
@@ -64,6 +66,7 @@ public class GlyphReader : MonoBehaviour
         m_history.Clear();          // on oublie les anciens votes
         m_current = "rien";         // on peut relancer le même sort qu'avant
         m_timer = 0f;               // on analyse tout de suite
+        m_failCount = 0;            // NOUVEAU : on repart de zéro à chaque geste
         m_discard = m_task != null; // une vieille analyse tourne encore ? on ignorera son résultat
         if (m_aimGuide != null) m_aimGuide.gameObject.SetActive(true);    // NOUVEAU : on montre le cercle de visée
     }
@@ -118,20 +121,27 @@ public class GlyphReader : MonoBehaviour
         int votes = 0;
         foreach (string s in m_history) if (s == seen) votes++;
 
+        // --- 5b. NOUVEAU : échecs d'affilée ---
+        // N'importe quel autre résultat (un glyphe, ou rien) remet le compteur à zéro :
+        // un faux cercle vu une ou deux fois dans le décor ne suffit plus.
+        if (seen == "inconnu") m_failCount++;
+        else m_failCount = 0;
+
         // Les 4 derniers messages restent affichés, pour avoir le temps de les lire
         m_messages.Enqueue(res.message);
         if (m_messages.Count > 4) m_messages.Dequeue();
-        m_text.text = $"Vu : {seen} ({votes}/{m_history.Count})\nValidé : {m_current}\n" + string.Join("\n", m_messages);
+        m_text.text = $"Vu : {seen} ({votes}/{m_history.Count})\nValidé : {m_current}\nÉchecs : {m_failCount}/{m_failsNeeded}\n" + string.Join("\n", m_messages);
+
+        // --- 6. NOUVEAU : le sort rate, une seule fois, pile quand le compteur atteint le seuil ---
+        if (m_failCount == m_failsNeeded) m_onFizzle.Invoke(CirclePosition(res));
 
         // On n'agit que quand le résultat validé change (sinon le sort se relancerait en boucle)
         if (votes < m_votesNeeded || seen == m_current) return;
         m_current = seen;
-        if (seen == "rien") return;
+        if (seen == "rien" || seen == "inconnu") return;   // "inconnu" est géré juste au-dessus
 
-        // --- 6. Le sort, à l'endroit du cercle ---
-        Vector3 pos = CirclePosition(res);
-        if (seen == "inconnu") m_onFizzle.Invoke(pos);
-        else m_onSpell.Invoke(seen, pos);
+        // --- 7. Le sort, à l'endroit du cercle ---
+        m_onSpell.Invoke(seen, CirclePosition(res));
     }
 
     // NOUVEAU : coin en bas à gauche de la zone analysée, en fraction de l'image (de 0 à 1).

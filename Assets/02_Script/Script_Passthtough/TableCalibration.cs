@@ -5,7 +5,9 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 
 // Au lancement, le joueur délimite sa table en pinçant 3 de ses coins, dans n'importe quel ordre.
-// On aligne ensuite l'environnement virtuel dessus et on ouvre la fenêtre passthrough.
+// On aligne ensuite l'environnement virtuel dessus, on l'accroche à une ancre spatiale
+// et on ouvre la fenêtre passthrough.
+// En jeu : le geste Menu de la main gauche relance le calibrage.
 public class TableCalibration : MonoBehaviour
 {
     [Header("Mains et tête")]
@@ -29,6 +31,7 @@ public class TableCalibration : MonoBehaviour
     private readonly List<GameObject> m_markers = new List<GameObject>();
     private bool[] m_wasPinching;   // la main pinçait-elle à l'image précédente ?
     private bool m_done;
+    private GameObject m_anchorObject; // l'objet qui porte l'ancre spatiale (parent de l'environnement)
 
     private static readonly string[] Steps =
     {
@@ -44,9 +47,15 @@ public class TableCalibration : MonoBehaviour
         Restart();
     }
 
-    // Public : pourra être appelée plus tard pour refaire le calibrage
+    // Public : peut aussi être appelée depuis un bouton ou un autre script
     public void Restart()
     {
+        // On décroche l'environnement de l'ancre AVANT de la détruire,
+        // sinon il serait détruit avec elle. "true" = il garde sa position dans le monde.
+        m_environment.SetParent(null, true);
+        if (m_anchorObject != null) Destroy(m_anchorObject);
+        m_anchorObject = null;
+
         foreach (GameObject m in m_markers) Destroy(m);
         m_markers.Clear();
         m_points.Clear();
@@ -58,13 +67,17 @@ public class TableCalibration : MonoBehaviour
 
     private void Update()
     {
-        if (m_done) return;
+        // Pincement main GAUCHE paume vers soi = geste "Menu" du Quest,
+        // vu par le SDK comme le bouton Start d'une manette -> on recalibre directement.
+        if (OVRInput.GetDown(OVRInput.Button.Start)) Restart();
 
         for (int i = 0; i < m_hands.Length; i++)
         {
             bool pinching = m_hands[i].GetIndexFingerIsPinching();
             // On ne réagit qu'au DÉBUT du pincement, sinon un pincement tenu compterait à chaque image
-            if (pinching && !m_wasPinching[i]) OnPinch(m_hands[i]);
+            if (!m_done && pinching && !m_wasPinching[i]) OnPinch(m_hands[i]);
+            // On met à jour m_wasPinching MÊME en jeu : sinon, juste après un recalibrage,
+            // le pincement encore tenu serait pris pour un nouveau coin.
             m_wasPinching[i] = pinching;
         }
     }
@@ -90,38 +103,26 @@ public class TableCalibration : MonoBehaviour
         // On calcule à plat (sans la hauteur)
         Vector3 p0 = Flat(m_points[0]), p1 = Flat(m_points[1]), p2 = Flat(m_points[2]);
 
-        // --- 1. Trouver la diagonale ---
-        // Sur 3 coins d'un rectangle, les deux points les plus éloignés sont forcément sur la diagonale.
-        // Le 3e point est le coin "entre les deux" (celui qui touche les deux bords).
-        Vector3 corner, q, r;
-        float d01 = Vector3.Distance(p0, p1), d02 = Vector3.Distance(p0, p2), d12 = Vector3.Distance(p1, p2);
-        if (d12 >= d01 && d12 >= d02)      { corner = p0; q = p1; r = p2; }
-        else if (d02 >= d01 && d02 >= d12) { corner = p1; q = p0; r = p2; }
-        else                               { corner = p2; q = p0; r = p1; }
+        // --- 1. Le bord avant = les 2 coins les plus proches du joueur ---
+        // On trie les 3 points selon leur distance à la tête (à plat).
+        // Les 2 premiers forment le bord face au joueur, le 3e est un coin du fond.
+        Vector3 head = Flat(m_head.position);
+        Vector3[] pts = { p0, p1, p2 };
+        System.Array.Sort(pts, (a, b) => Vector3.Distance(a, head).CompareTo(Vector3.Distance(b, head)));
+        Vector3 frontA = pts[0], frontB = pts[1], back = pts[2];
 
-        // --- 2. Les deux axes de la table ---
-        Vector3 axis1 = (q - corner).normalized;             // le long d'un bord
-        Vector3 axis2 = Vector3.Cross(Vector3.up, axis1);     // l'autre bord, bien perpendiculaire
-        Vector3 diagonal = r - q;
-        float size1 = Mathf.Abs(Vector3.Dot(diagonal, axis1));   // longueur du bord le long de axis1
-        float size2 = Mathf.Abs(Vector3.Dot(diagonal, axis2));   // longueur du bord le long de axis2
-        Vector3 center = (q + r) / 2f;                        // le centre = milieu de la diagonale
+        // --- 2. Les axes de la table ---
+        Vector3 side = (frontB - frontA).normalized;             // le long du bord avant (largeur)
+        Vector3 forward = Vector3.Cross(side, Vector3.up);        // perpendiculaire au bord avant (profondeur)
+        if (Vector3.Dot(back - frontA, forward) < 0f) forward = -forward;   // il doit pointer vers le fond de la table
+
+        // --- 3. Dimensions et centre ---
+        float width = Vector3.Distance(frontA, frontB);
+        // Profondeur = distance du coin du fond au bord avant, mesurée perpendiculairement.
+        // Ça marche que le coin du fond soit au-dessus de frontA ou de frontB.
+        float depth = Vector3.Dot(back - frontA, forward);
+        Vector3 center = (frontA + frontB) / 2f + forward * (depth / 2f);   // milieu du bord avant, avancé de la moitié de la profondeur
         center.y = height;
-
-        // --- 3. Quel bord est face au joueur ? ---
-        // "forward" doit pointer du joueur vers le fond de la table.
-        Vector3 toTable = Flat(center - m_head.position);
-        Vector3 forward;
-        float width, depth;
-        if (Mathf.Abs(Vector3.Dot(toTable, axis1)) > Mathf.Abs(Vector3.Dot(toTable, axis2)))
-        {
-            forward = axis1; depth = size1; width = size2;
-        }
-        else
-        {
-            forward = axis2; depth = size2; width = size1;
-        }
-        if (Vector3.Dot(toTable, forward) < 0f) forward = -forward;   // on le retourne s'il pointe vers le joueur
 
         // --- 4. Aligner l'environnement ---
         // On tourne d'abord (ce qui déplace aussi TableAnchor), puis on déplace.
@@ -131,6 +132,15 @@ public class TableCalibration : MonoBehaviour
 
         // La fenêtre prend la taille de la table (le quad est couché : x = largeur, y = profondeur)
         m_window.localScale = new Vector3(width + 2f * m_margin, depth + 2f * m_margin, 1f);
+
+        // --- 5. Ancre spatiale ---
+        // On crée un objet pile au centre de la vraie table et on lui ajoute un OVRSpatialAnchor.
+        // Le casque va alors suivre ce point dans la VRAIE pièce : si le tracking dérive
+        // ou si le joueur recentre la vue, l'ancre (et donc tout l'environnement enfant) reste collée à la table.
+        m_anchorObject = new GameObject("TableSpatialAnchor");
+        m_anchorObject.transform.SetPositionAndRotation(center, targetRot);
+        m_anchorObject.AddComponent<OVRSpatialAnchor>();
+        m_environment.SetParent(m_anchorObject.transform, true);   // true = ne bouge pas au moment du rattachement
 
         foreach (GameObject m in m_markers) Destroy(m);
         m_markers.Clear();
