@@ -22957,6 +22957,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: Map
       objectReference: {fileID: 0}
+    - target: {fileID: 3615160971992752225, guid: d2410b664858d4e498eacaaad478707d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.213
+      objectReference: {fileID: 0}
+    - target: {fileID: 3615160971992752225, guid: d2410b664858d4e498eacaaad478707d, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.021
+      objectReference: {fileID: 0}
+    - target: {fileID: 3615160971992752225, guid: d2410b664858d4e498eacaaad478707d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.166
+      objectReference: {fileID: 0}
+    - target: {fileID: 6987758957397940172, guid: d2410b664858d4e498eacaaad478707d, type: 3}
+      propertyPath: decalage
+      value: 0.003
+      objectReference: {fileID: 0}
+    - target: {fileID: 6987758957397940172, guid: d2410b664858d4e498eacaaad478707d, type: 3}
+      propertyPath: inverserCote
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7635012111785223801, guid: d2410b664858d4e498eacaaad478707d, type: 3}
       propertyPath: tete
       value: 

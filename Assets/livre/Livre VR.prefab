@@ -376,6 +376,7 @@ GameObject:
   - component: {fileID: 7810078505916597270}
   - component: {fileID: 9165606761140391501}
   - component: {fileID: 3554595285631164975}
+  - component: {fileID: 3223192194716086056}
   m_Layer: 0
   m_Name: Image Page
   m_TagString: Untagged
@@ -469,6 +470,29 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &3223192194716086056
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3963547359486302196}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bfb34de3b8e43643904ff1b1ab673fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ImagePageCourbee
+  feuilleSource: {fileID: 4059126736180044403}
+  osFeuille:
+  - {fileID: 330737059658298943}
+  - {fileID: 8298869178871892270}
+  - {fileID: 8347511002968566661}
+  decoupesLargeur: 20
+  decoupesHauteur: 4
+  inverserLargeur: 0
+  decalage: 0.002
+  inverserCote: 0
+  afficherInfos: 1
 --- !u!1 &4516874257628141156
 GameObject:
   m_ObjectHideFlags: 0
@@ -1166,6 +1190,7 @@ GameObject:
   - component: {fileID: 2063885214529223392}
   - component: {fileID: 6346173783573539116}
   - component: {fileID: 6444681485240877705}
+  - component: {fileID: 419995640816754148}
   m_Layer: 0
   m_Name: Image Page
   m_TagString: Untagged
@@ -1259,6 +1284,29 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &419995640816754148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7049923747462755115}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bfb34de3b8e43643904ff1b1ab673fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ImagePageCourbee
+  feuilleSource: {fileID: 4059126736180044403}
+  osFeuille:
+  - {fileID: 330737059658298943}
+  - {fileID: 8298869178871892270}
+  - {fileID: 8347511002968566661}
+  decoupesLargeur: 20
+  decoupesHauteur: 4
+  inverserLargeur: 0
+  decalage: 0.002
+  inverserCote: 0
+  afficherInfos: 1
 --- !u!1 &8093666356906010063
 GameObject:
   m_ObjectHideFlags: 0
@@ -1560,6 +1608,7 @@ GameObject:
   - component: {fileID: 5490416692363913880}
   - component: {fileID: 1755086521941739435}
   - component: {fileID: 2519926806036182115}
+  - component: {fileID: 3777453676090898920}
   m_Layer: 6
   m_Name: Livre VR
   m_TagString: Untagged
@@ -1601,6 +1650,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LivreVR
   pages:
+  - 000_vide
   - 00_couverture
   - 01_texte_1
   - 02_ambiance_materiel
@@ -1626,7 +1676,6 @@ MonoBehaviour:
   - 22_ambiance_carte
   - 23_dechiree
   - 24_finale_scellee
-  - 25_finale_debloquee
   - 26_index_1
   - 27_index_2
   - 28_lexique_effets
@@ -1636,6 +1685,7 @@ MonoBehaviour:
   courbure: 30
   ouvertAuDemarrage: 0
   raccourcisClavier: 1
+  testTourAutoEnBoucle: 0
   sonPage: {fileID: 0}
   osOuverture: {fileID: 1177269327608732009}
   osFeuille1: {fileID: 330737059658298943}
@@ -1771,6 +1821,84 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 9bea81381120d2d44adf0aba1690c6cf, type: 3}
   - {fileID: 2800000, guid: 27d72fef4e94c8e49b31f203f5f40a32, type: 3}
   - {fileID: 2800000, guid: 6e190fbc2b12e9640a54bb44f650c570, type: 3}
+  - {fileID: 2800000, guid: 9d45dc66a10127a4bb3c6873a6e1c962, type: 3}
+--- !u!114 &3777453676090898920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8673168926405171263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd02b0cb4980e5742b511bdbc05db657, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SymbolesLivre
+  livre: {fileID: 7988229950259564244}
+  prefabCase: {fileID: 1120942140393464787, guid: dede22f0ccb57b841a893572ca975c47, type: 3}
+  symboles:
+  - {fileID: 21300000, guid: 556d637f56373784cbcdde84262d2150, type: 3}
+  - {fileID: 21300000, guid: 86918a455688bf54eb8dc0a5a325885a, type: 3}
+  - {fileID: 21300000, guid: b1fdcbb92ce4d954dabf4fbfab115473, type: 3}
+  - {fileID: 21300000, guid: c53eb1deb7f8b5941bb54affed0ebd09, type: 3}
+  - {fileID: 21300000, guid: 8271aff61b73913478e3aa4d08e40388, type: 3}
+  pagesSymboles:
+  - page: 9
+    nomSort: fire
+    positionRecap: {x: 0.5, y: 0.733}
+    cases:
+    - position: {x: 0.5, y: 0.19}
+      solution: 0
+  - page: 11
+    nomSort: water
+    positionRecap: {x: 0.166, y: 0.559}
+    cases:
+    - position: {x: 0.5, y: 0.19}
+      solution: 1
+  - page: 13
+    nomSort: wind
+    positionRecap: {x: 0.832, y: 0.559}
+    cases:
+    - position: {x: 0.5, y: 0.19}
+      solution: 2
+  - page: 17
+    nomSort: earth
+    positionRecap: {x: 0.293, y: 0.28}
+    cases:
+    - position: {x: 0.5, y: 0.19}
+      solution: 3
+  - page: 20
+    nomSort: light
+    positionRecap: {x: 0.705, y: 0.28}
+    cases:
+    - position: {x: 0.5, y: 0.19}
+      solution: 4
+  pageRecap: 25
+  echelleRecap: 0.3
+  pageADebloquer: 25
+  nouveauContenu: 25_finale_debloquee
+  garderRecapApresDeblocage: 0
+  decalage: -0.001
+  rotationCase: {x: 0, y: 180, z: 0}
+  echelle: 2.5
+  inverserGaucheDroite: 0
+  inverserHautBas: 0
+  inverserCote: 1
+  commencerVide: 1
+  masquerApercusQuandValide: 0
+  sonPoke: {fileID: 0}
+  sonPageValidee: {fileID: 0}
+  sonResolu: {fileID: 0}
+  onPageValidee:
+    m_PersistentCalls:
+      m_Calls: []
+  onPageInvalidee:
+    m_PersistentCalls:
+      m_Calls: []
+  onToutResolu:
+    m_PersistentCalls:
+      m_Calls: []
+  raccourcisClavier: 1
 --- !u!1001 &293423187512124746
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1900,6 +2028,10 @@ PrefabInstance:
       value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 4343326665838462777, guid: 56999d3466babc74c821261a2571dc2e, type: 3}
+      propertyPath: m_Quality
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4343326665838462777, guid: 56999d3466babc74c821261a2571dc2e, type: 3}
       propertyPath: m_UpdateWhenOffscreen
       value: 1
       objectReference: {fileID: 0}
@@ -1963,6 +2095,11 @@ Transform:
 --- !u!4 &2092416885572918473 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1809234047790987651, guid: 56999d3466babc74c821261a2571dc2e, type: 3}
+  m_PrefabInstance: {fileID: 293423187512124746}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &4059126736180044403 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 4343326665838462777, guid: 56999d3466babc74c821261a2571dc2e, type: 3}
   m_PrefabInstance: {fileID: 293423187512124746}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &8298869178871892270 stripped

@@ -249,12 +249,18 @@ public class SymbolesLivre : MonoBehaviour
                 continue;
 
             var filtre = image.GetComponent<MeshFilter>();
-            if (filtre == null || filtre.sharedMesh == null)
+            if (filtre == null)
                 break;
+
+            // ImagePageCourbee (sur le recto / verso) retire le mesh du Quad au lancement pour afficher
+            // sa copie courbée à la place. Dans ce cas, on reprend la taille d'un Quad Unity standard
+            // (de -0.5 à 0.5 sur X et Y), sinon la case serait placée au mauvais endroit.
+            var b = filtre.sharedMesh != null
+                ? filtre.sharedMesh.bounds
+                : new Bounds(Vector3.zero, new Vector3(1f, 1f, 0f));
 
             // On regarde la boîte du mesh : l'axe le plus fin est l'épaisseur (la normale),
             // les deux autres sont la largeur et la hauteur de la page.
-            var b = filtre.sharedMesh.bounds;
             var support = new Support { transform = image.transform, min = b.min };
 
             if (b.size.y < b.size.x && b.size.y < b.size.z)
@@ -292,14 +298,22 @@ public class SymbolesLivre : MonoBehaviour
         if (!raccourcisClavier || clavier == null)
             return;
 
-        if (clavier.pKey.wasPressedThisFrame)
+        if (Appuye(clavier, "p"))
             PokePremiereCase(LivreVR.Surface.Gauche);
-        else if (clavier.mKey.wasPressedThisFrame)
+        else if (Appuye(clavier, "m"))
             PokePremiereCase(LivreVR.Surface.Recto);
-        else if (clavier.kKey.wasPressedThisFrame)
+        else if (Appuye(clavier, "k"))
             LancerSortDeLaPage(LivreVR.Surface.Gauche);
-        else if (clavier.lKey.wasPressedThisFrame)
+        else if (Appuye(clavier, "l"))
             LancerSortDeLaPage(LivreVR.Surface.Recto);
+    }
+
+    // L'Input System repère les touches par leur PLACE sur un clavier QWERTY (clavier.mKey = la touche ","
+    // sur un AZERTY). On cherche donc la touche par la lettre écrite dessus, selon la langue du clavier.
+    static bool Appuye(Keyboard clavier, string lettre)
+    {
+        var touche = clavier.FindKeyOnCurrentKeyboardLayout(lettre);
+        return touche != null && touche.wasPressedThisFrame;
     }
 
     // LateUpdate : après LivreVR, pour voir les textes déjà mis à jour cette image-ci.
