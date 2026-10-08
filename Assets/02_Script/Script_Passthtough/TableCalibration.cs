@@ -241,6 +241,20 @@ public class TableCalibration : MonoBehaviour
         m_restorePending = true;
     }
 
+    // Le dessus du bureau virtuel (utilisé par FinDuJeu pour poser l'image).
+    public Transform TableAnchor => m_tableAnchor;
+
+    // Remet tout de suite le rig à la pose mémorisée au calibrage : la table virtuelle retombe sur la vraie.
+    // Utilisée par FinDuJeu. Ne fait rien si la table n'a pas encore été calibrée.
+    // Attention : avec FirstPersonLocomotor actif, sa capsule doit pouvoir suivre ;
+    // FinDuJeu désactive donc le locomoteur AVANT d'appeler cette méthode.
+    public void RamenerAuBureau()
+    {
+        if (!m_done || m_rig == null) return;
+        m_restorePending = false;
+        m_rig.SetPositionAndRotation(m_calibratedRigPose.position, m_calibratedRigPose.rotation);
+    }
+
     // Exécuté au début de la frame qui suit la téléportation : le locomoteur a fini de bouger le rig.
     private void RestoreRigIfPending()
     {

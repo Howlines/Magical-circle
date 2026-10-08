@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 
 // Reçoit les sorts envoyés par GlyphReader et fait apparaître l'effet.
 // Un composant SpellCaster par glyphe.
@@ -16,6 +17,9 @@ public class SpellCaster : MonoBehaviour
 
     [Header("Verrou (uniquement pour le sort de fin)")]
     [SerializeField] private SymbolesLivre m_book;              // vide = pas de verrou, le sort marche toujours
+
+    [Header("Après le sort")]
+    [SerializeField] private UnityEvent m_onCast;               // appelé juste après l'apparition de l'effet (ex : FinDuJeu.Lancer pour le sort de fin)
 
     // Appelée par l'événement m_onSpell de GlyphReader.
     // Doit être public et avoir exactement ces paramètres (string, Vector3) pour apparaître dans l'Inspector.
@@ -42,5 +46,8 @@ public class SpellCaster : MonoBehaviour
         // --- 4. --- Lancer l'effet
         GameObject fx = Instantiate(m_effectPrefab, spawnPos, Quaternion.identity);
         Destroy(fx, m_lifetime);            // nettoyage automatique
+
+        // --- 5. --- Prévenir les autres scripts (rien n'est branché par défaut)
+        m_onCast.Invoke();
     }
 }
