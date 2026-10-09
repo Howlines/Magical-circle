@@ -96,6 +96,7 @@ public class MenuDepart : MonoBehaviour
     IEnumerator Partir()
     {
         m_EnTrainDePartir = true;
+        Debug.Log($"[DBG] MenuDepart.Partir : message = {(message != null ? message.name : "NULL")}"); // [DBG] temporaire
 
         // Le message lancera la suite quand le joueur l'aura fermé.
         // Sans message, on lance la suite tout de suite.
@@ -138,6 +139,7 @@ public class MenuDepart : MonoBehaviour
 
     public void Commencer()
     {
+        Debug.Log($"[DBG] MenuDepart.Commencer (déjà en train de partir : {m_EnTrainDePartir})"); // [DBG] temporaire
         if (!m_EnTrainDePartir)
             StartCoroutine(Partir());
     }
@@ -182,6 +184,7 @@ public class MenuDepart : MonoBehaviour
     public void PlacerDevant(Transform objet, float dist, float plusBas)
     {
         var t = tete != null ? tete : Camera.main != null ? Camera.main.transform : null;
+        Debug.Log($"[DBG] PlacerDevant({objet.name}) : tête = {(t != null ? t.name + " " + t.position : "NULL → pas de placement")}"); // [DBG] temporaire
         if (t == null)
             return;
 

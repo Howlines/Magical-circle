@@ -15,6 +15,16 @@ public class MessageMystere : MonoBehaviour
     [Tooltip("Entrée : fermer le message.")]
     public bool raccourcisClavier = true;
 
+    [Header("Placement devant le joueur")]
+    [Tooltip("Distance du message devant la tête, en mètres (le menu est à 0.55).")]
+    public float distanceDevant = 0.55f;
+    [Tooltip("De combien le message est plus bas que les yeux, en mètres (le menu est à 0.2).")]
+    public float sousLesYeux = 0.2f;
+
+    [Header("Fin du message")]
+    [Tooltip("Désactivé au moment exact où le message finit de disparaître (ex : la sphère FondMenu). Vide = rien.")]
+    public GameObject fondADesactiver;
+
     CanvasGroup m_Groupe;
     float m_DureeFondu = 2f;
     bool m_PeutFermer;       // vrai une fois le message complètement apparu
@@ -34,10 +44,15 @@ public class MessageMystere : MonoBehaviour
         m_EnTrainDeFermer = false;
 
         gameObject.SetActive(true);
-        menu.PlacerDevant(transform, menu.distanceMessage, 0f);
+        menu.PlacerDevant(transform, distanceDevant, sousLesYeux);
+        Debug.Log($"[DBG] MessageMystere.Afficher : actif = {gameObject.activeInHierarchy}, position = {transform.position}, rotation = {transform.eulerAngles}"); // [DBG] temporaire
         StopAllCoroutines();
         StartCoroutine(Apparaitre());
     }
+
+    // [DBG] temporaire : montre QUAND le message est activé / désactivé, même si ce n'est pas par Afficher()
+    void OnEnable() => Debug.Log($"[DBG] MessageMystere OnEnable : position = {transform.position}, alpha = {GetComponent<CanvasGroup>().alpha}");
+    void OnDisable() => Debug.Log("[DBG] MessageMystere OnDisable");
 
     /// <summary>À relier au OnClick du bouton du message.</summary>
     public void Fermer()
@@ -73,6 +88,8 @@ public class MessageMystere : MonoBehaviour
         m_QuandFerme = null;
         suite?.Invoke();
 
+        if (fondADesactiver != null)
+            fondADesactiver.SetActive(false);
         gameObject.SetActive(false);
     }
 
