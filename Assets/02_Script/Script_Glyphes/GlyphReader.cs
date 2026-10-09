@@ -141,6 +141,9 @@ public class GlyphReader : MonoBehaviour
         if (seen == "rien" || seen == "inconnu") return;   // "inconnu" est géré juste au-dessus
 
         // --- 7. Le sort, à l'endroit du cercle ---
+        // [DBG] temporaire : liste les cibles branchées sur On Spell (une cible "NULL" = référence vide dans l'Inspector)
+        for (int i = 0; i < m_onSpell.GetPersistentEventCount(); i++)
+            Debug.Log($"[DBG] GlyphReader '{seen}' -> {m_onSpell.GetPersistentMethodName(i)} sur {(m_onSpell.GetPersistentTarget(i) != null ? m_onSpell.GetPersistentTarget(i).name : "NULL")}");
         m_onSpell.Invoke(seen, CirclePosition(res));
     }
 

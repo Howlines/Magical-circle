@@ -204,6 +204,7 @@ public class SymbolesLivre : MonoBehaviour
     /// </summary>
     public void SortLance(string nomSort)
     {
+        Debug.Log($"[DBG] SymbolesLivre.SortLance(\"{nomSort}\") reçu", this); // [DBG] temporaire
         var nom = Normaliser(nomSort);
         if (string.IsNullOrEmpty(nom) || !m_SortsLances.Add(nom))
             return; // déjà lancé avant : rien de nouveau
@@ -416,6 +417,8 @@ public class SymbolesLivre : MonoBehaviour
         {
             var bonne = PageEstBonne(p);
             var etaitValidee = m_PagesValidees.Contains(p);
+            // [DBG] temporaire
+            Debug.Log($"[DBG] page {p.page} ({p.nomSort}) : choisi={p.cases[0].actuel} attendu={p.cases[0].solution} sortLancé={SortDejaLance(p.nomSort)} -> bonne={bonne}", this);
 
             if (bonne && !etaitValidee)
             {
@@ -436,6 +439,7 @@ public class SymbolesLivre : MonoBehaviour
                 tout = false;
         }
 
+        Debug.Log($"[DBG] VerifierTout : tout={tout}, sorts lancés = [{string.Join(", ", m_SortsLances)}], pageADebloquer={pageADebloquer}, nouveauContenu=\"{nouveauContenu}\"", this); // [DBG] temporaire
         if (!tout)
             return;
 
