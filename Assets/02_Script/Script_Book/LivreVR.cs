@@ -3,6 +3,7 @@ using TMPro;
 using Oculus.Interaction;
 using Oculus.Interaction.HandGrab;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 /// <summary>
@@ -40,6 +41,10 @@ public class LivreVR : MonoBehaviour
 
     [Header("Son (optionnel)")]
     public AudioSource sonPage;
+
+    [Header("Événements")]
+    [Tooltip("Une page a FINI de tourner (avant ou arrière, auto ou à la main). Pas appelé si la feuille retombe sans tourner, ni pour la couverture.")]
+    public UnityEvent onPageTournee;
 
     [Header("Références (remplies par Tools > Livre VR)")]
     public Transform osOuverture;
@@ -282,6 +287,7 @@ public class LivreVR : MonoBehaviour
         PoserFeuille(0f, 0f);
         AfficherDoublePage();
         m_Occupe = false;
+        onPageTournee.Invoke();
     }
 
     IEnumerator TournerVersLaGauche()
@@ -305,6 +311,7 @@ public class LivreVR : MonoBehaviour
         PoserFeuille(0f, 0f);
         AfficherDoublePage();
         m_Occupe = false;
+        onPageTournee.Invoke();
     }
 
     // --- Manipulation à la main (feuille ou couverture) -------------------------------------
@@ -434,6 +441,7 @@ public class LivreVR : MonoBehaviour
         var depart = m_AngleManuel;
         // Sens +1 (page suivante / ouvrir) : complet = 180. Sens -1 (page précédente / fermer) : complet = 0.
         var cible = (m_SensManuel > 0) == complet ? 180f : 0f;
+        var pageTournee = m_Mode == ModeManuel.Feuille && complet; // feuille allée au bout (pas la couverture, pas un retour)
 
         if (m_Mode == ModeManuel.Feuille)
         {
@@ -459,6 +467,9 @@ public class LivreVR : MonoBehaviour
         m_Mode = ModeManuel.Aucun;
         m_Occupe = false;
         MettreAJourEtat(); // remet le grab dans l'état normal
+
+        if (pageTournee)
+            onPageTournee.Invoke();
     }
 
     // Pendant qu'on tourne une page, la main qui pince ne doit pas aussi attraper le livre.
